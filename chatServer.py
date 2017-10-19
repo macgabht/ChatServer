@@ -55,15 +55,12 @@ if __name__ == "__main__":
                     #In Windows, sometimes when a TCP program closes abruptly,
                     # a "Connection reset by peer" exception will be thrown
                     data = sock.recv(RECV_BUFFER)
-                    #data = raw_input()
-                    #if data == "KILL_SERVICE":
-                      # break
-                    #elif data =="Hello text\n";
-                      # broadcast_data(
-                    
-                   
                     if data:
-                        broadcast_data(sock, "\r" + '<' + str(sock.getpeername()) + '> ' + data)                
+			                    mystring = str(data)
+		                 	   if mystring == "KILL_SERVICE"
+                         sys.exit(0)
+                    else:
+                         broadcast_data(sock, "\r" + '<' + str(sock.getpeername()) + '> ' + data)                
                  
                 except:
                     broadcast_data(sock, "Client (%s, %s) is offline" % addr)
