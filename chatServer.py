@@ -1,6 +1,7 @@
 # Tcp Chat server
  
 import socket, select
+#select is function that takes potential read, write and error sockets, and returns readable, writable and error sockets
  
 #Function to broadcast chat messages to all connected clients
 def broadcast_data (sock, message):
