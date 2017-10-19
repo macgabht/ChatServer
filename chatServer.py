@@ -20,6 +20,7 @@ if __name__ == "__main__":
     CONNECTION_LIST = []
     RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
     PORT = 5000
+    STUDENT_NUMBER = 13325213
      
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this has no effect, why ?
@@ -53,7 +54,14 @@ if __name__ == "__main__":
                     #In Windows, sometimes when a TCP program closes abruptly,
                     # a "Connection reset by peer" exception will be thrown
                     data = sock.recv(RECV_BUFFER)
-                    if data:
+                    data = raw_input()
+                    if data == "KILL_SERVICE":
+                       break
+                    elif data =="Hello text\n";
+                       broadcast_data(
+                    
+                   
+                    elif data:
                         broadcast_data(sock, "\r" + '<' + str(sock.getpeername()) + '> ' + data)                
                  
                 except:
