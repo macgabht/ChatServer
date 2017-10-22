@@ -1,72 +1,34 @@
-# Tcp Chat server
- 
-import socket, select
-#select is function that takes potential read, write and error sockets, and returns readable, writable and error sockets
- 
-#Function to broadcast chat messages to all connected clients
-def broadcast_data (sock, message):
-    #Do not send the message to master socket and the client who has send us the message
-    for socket in CONNECTION_LIST:
-        if socket != server_socket and socket != sock :
-            try :
-                socket.send(message)
-            except :
-                # broken socket connection may be, chat client pressed ctrl+c for example
-                socket.close()
-                CONNECTION_LIST.remove(socket)
- 
-if __name__ == "__main__":
-     
-    # List to keep track of socket descriptors
-    CONNECTION_LIST = []
-    RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
-    PORT = 5000
-    STUDENT_NUMBER = 13325213
-     
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # this has no effect, why ?
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(("0.0.0.0", PORT))
-    server_socket.listen(10)
- 
-    # Add server socket to the list of readable connections
-    CONNECTION_LIST.append(server_socket)
- 
-    print "Chat server started on port " + str(PORT)
- 
-    while 1:
-        # Get the list sockets which are ready to be read through select
-        read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
- 
-        for sock in read_sockets:
-            #New connection
-            if sock == server_socket:
-                # Handle the case in which there is a new connection recieved through server_socket
-                sockfd, addr = server_socket.accept()
-                CONNECTION_LIST.append(sockfd)
-                print "Client (%s, %s) connected" % addr
-                 
-                broadcast_data(sockfd, "[%s:%s] entered room\n" % addr)
-             
-            #Some incoming message from a client
-            else:
-                # Data recieved from client, process it
-                try:
-                    #In Windows, sometimes when a TCP program closes abruptly,
-                    # a "Connection reset by peer" exception will be thrown
-                    data = sock.recv(RECV_BUFFER)
-                    if data:
-			                    mystring = str(data)
-		                 	   if mystring == "KILL_SERVICE"
-                         sys.exit(0)
-                    else:
-                         broadcast_data(sock, "\r" + '<' + str(sock.getpeername()) + '> ' + data)                
-                 
-                except:
-                    broadcast_data(sock, "Client (%s, %s) is offline" % addr)
-                    print "Client (%s, %s) is offline" % addr
-                    sock.close()
-                    CONNECTION_LIST.remove(sock)
-                    continue
-     
-    server_socket.close()
+import select, socket, pdb, sys
+from t_util import Block, Room, Player
+import t_util
+
+RECV_BUFFER = 4096
+
+host = sys.argv[1] if len (sys.argv) >=2 else ''
+listen_sock = t_util.create_socket((host, t_util.PORT))
+
+hall = Hall() #essentially a constructor for class "Block"
+connection_list = [] #starts out empty connection list
+connection_list.append(listen_sock) #updates connection list with with listen socket
+
+while True:
+	
+`	# get the list sockets which are ready to be read through select
+        # 4th arg, time_out  = 0 : poll and never block
+	#here we handle the new players/sockets, intially passed to the select function
+	
+	read_players, write_players, error_sockets = select.select(connection_list, [], [])
+    	for player in read_players:
+       		if player is listen_sock: # compares returned readable sockets/players to the connection made to client(listen_sock)
+		     new_socket, add = player.accept()
+		     new_player = Player(new_socket) #this passes this new socket to the player class and updates
+             	     connection_list.append(new_player) #update our connection list with each new player
+                     hall.welcome_new(new_player) #calls welcome function in Hall
+
+		else: 
+		     msg = player.socket.recv(RECV_BUFFER)
+		     if msg:
+			 msg = msg.lower()
+			 hall.process_msg(player, msg)
+
+
