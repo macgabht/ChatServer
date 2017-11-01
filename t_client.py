@@ -76,6 +76,10 @@ while True:
 	    elif '<HELO>'in msg:
                 msg = 'HELO text\n'
                 server_connection.sendall(msg)
+               
+            elif '<list>' in msg:
+                msg = '<list>\n' 
+                server_connection.sendall(msg)
 
 			
             else:
