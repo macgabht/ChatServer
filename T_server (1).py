@@ -18,26 +18,22 @@ while True:
 	#here we handle the new players/sockets, intially passed to the select function
 	
 	read_players, write_players, error_sockets = select.select(connection_list, [], [])
-    for player in read_players:
-       	if player is listen_sock: # compares returned readable sockets/players to the connection made to client(listen_sock)
-		    new_socket, add = player.accept()
-		    new_player = Player(new_socket) #this passes this new socket to the player class and updates
-            connection_list.append(new_player) #update our connection list with each new player
-			hall.welcome_new(new_player) #calls welcome function in Hall
+    	for player in read_players:
+       		if player is listen_sock: # compares returned readable sockets/players to the connection made to client(listen_sock)
+		     new_socket, add = player.accept()
+		     new_player = Player(new_socket) #this passes this new socket to the player class and updates
+             	     connection_list.append(new_player) #update our connection list with each new player
+                     hall.welcome_new(new_player) #calls welcome function in Hall
 
 		else: #new message incoming
-		    msg = player.socket.recv(RECV_BUFFER)
-		    if msg:
-			    hall.process_msg(player, msg)
-				
-	        else:
-				data = ("ERROR_CODE: [] \n' + 'ERROR_DESCRIPTION: Error in connection.' + '\n')
-				player.socket.sendall(data)
-			    player.socket.close()
-			    connection_list.remove(player)
+		     msg = player.socket.recv(RECV_BUFFER)
+		     if msg:
+			 hall.process_msg(player, msg)
+	             else:
+			player.socket.close()
+			connection_list.remove(player)
 
-	for sock in error_sockets: #close alll error sockets returned by select.select
+	for sock in error_sockets: #close alll error sockets
 	    sock.close()
 	    connection_list.remove(sock)
-
 
