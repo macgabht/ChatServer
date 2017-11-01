@@ -34,15 +34,18 @@ while True:
                 print("Server down!")
                 sys.exit(2)
             else:
-                if msg == t_util.QUIT_STRING:
-                    sys.stdout.write("That's it from me folks\n")
+                if  msg == t_util.QUIT_STRING:
+                    sys.stdout.write(QUIT_STRING)
                     sys.exit(2)
-				elif "JOINED_CHATROOM" in msg:
-					ROOM_REF = msg.split()[7]
-					JOIN_ID = msg.split()[9]
-					sys.stdout.write(msg)
-					msg_prefix = ''
-				prompt()
+                elif "LEFT_CHATROOM" in msg:
+                    sys.stdout.write(msg)
+                    
+                elif "JOINED_CHATROOM" in msg:
+                    ROOM_REF = msg.split()[7]
+                    JOIN_ID = msg.split()[9]
+                    sys.stdout.write(msg)
+                    msg_prefix = ''
+               
                 else:
                     sys.stdout.write(msg)
                     msg_prefix = ''
@@ -54,19 +57,21 @@ while True:
                 room_name = msg.split()[1]
                 msg = ('JOIN_CHATROOM: '+ str(room_name) +'\n'+ 'CLIENT_IP: ' + str(CLIENT_IP)  + '\n'
                 + 'PORT: ' + str(PORT) + '\n' +'CLIENT_NAME: ' + str(CLIENT_NAME)  + '\n')	
-				server_connection.sendall(msg)
+                server_connection.sendall(msg)
 			
-			elif '<leave>' in msg:
-				msg = ('LEAVE_CHATROOM: ' + str(ROOM_REF) + '\n' + 'JOIN_ID' + str(JOIN_ID)
-				+ '\n' + 'CLIENT_NAME' + str(CLIENT_NAME) + '\n')
-				server.connection.sendall(msg)
+            elif '<leave>' in msg:
+                msg = ('LEAVE_CHATROOM: ' + str(ROOM_REF) + '\n' + 'JOIN_ID: ' + str(JOIN_ID)
+                + '\n' + 'CLIENT_NAME: ' + str(CLIENT_NAME) + '\n')
+                server_connection.sendall(msg)
 			
-			elif <disconnect> in msg:
-				msg = ('DISCONNECT: ' + str(CLIENT_IP) + '\n' + 'PORT: ' 
-				+ str(PORT) + 'CLIENT_NAME: ' + str(CLIENT_NAME) + '\n')
+            elif '<disconnect>' in msg:
+                msg = ('DISCONNECT: ' + str(CLIENT_IP) + '\n' + 'PORT: ' 
+                + str(PORT) + '\n' + 'CLIENT_NAME: ' + str(CLIENT_NAME) + '\n')
+                server_connection.sendall(msg)
 			
-	    else:
-		    server_connection.sendall(msg)
+            else:
+                data = 'CHAT: ' + str(ROOM_REF) + '\n' + 'CLIENT_NAME: ' + str(CLIENT_NAME) + '\n' + 'MESSAGE: ' + str(msg) + '\n' 
+                server_connection.sendall(data)
 
 		    
                 
