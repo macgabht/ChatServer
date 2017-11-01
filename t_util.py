@@ -1,10 +1,11 @@
-import socket, pdb, re, random
+import socket, pdb, re, random, sys
 
 ROOM_REF = random.randint(1,50001)
 JOIN_ID = random.randint(1, 50001)
 SERVER_IP = '134.226.44.169'
 MAX_CLIENTS = 30
 PORT = 22222
+STUDENT_ID = 13325213
 QUIT_STRING = '<$leave$>'
 
 
@@ -12,8 +13,10 @@ instructions = b'Instructions:\n'\
             + b'[<list>] to list all rooms\n'\
             + b'[<join>] to join/create/switch to a room\n' \
             + b'[<guide>] to show instructions\n' \
-            + b'[<leave>] to quit\n' \
-			+ b'[<disconnect>] to quit\n' \
+            + b'[<leave>] to leave your chatroom\n' \
+			+ b'[<disconnect>] to disconnect from the service\n' \
+            + b'[<kill>] to terminate the service\n' \
+            + b'[<HELO>] to send a test hello string\n' \
             + b'Otherwise start typing and enjoy!' \
             + b'\n'
 
@@ -50,7 +53,7 @@ class Hall:
     def process_msg(self, player, msg):
 	
 
-        print('\n' + player.name + " says: " + msg)
+        print(player.name + " says: " + msg)
 	
         if "JOIN_CHATROOM" in msg:
             same_room = False
@@ -93,12 +96,19 @@ class Hall:
             player.socket.shutdown(1)
             self.remove_player(player)
             
-            
-        
         elif "LEAVE_CHATROOM" in msg: #receives from server sends to remove function
             data = "LEFT_CHATROOM: " +str(ROOM_REF) + '\n' + "JOIN_ID: " + str(ROOM_REF) + '\n'
             player.socket.sendall(data)
             self.remove_player(player) 
+        
+        elif "KILL_SERVICE" in msg:
+            sys.exit(2)
+
+        elif 'HELO text\n' in msg:
+            data = 'HELO text\nIP:'+str(SERVER_IP)+'\n'+'Port:'+str(PORT)+'\n'+'StudentID: '+str(STUDENT_ID)+'\n'
+            player.socket.sendall(data)
+
+            
             
         else:
             # check if in a room or not first
