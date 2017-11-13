@@ -14,8 +14,9 @@ instructions = b'Instructions:\n'\
             + b'[<join>] to join/create/switch to a room\n' \
             + b'[<guide>] to show instructions\n' \
             + b'[<leave>] to leave your chatroom\n' \
-			+ b'[<disconnect>] to disconnect from the service\n' \
+            + b'[<disconnect>] to disconnect from the service\n' \
             + b'[<kill>] to terminate the service\n' \
+            + b'[<another>] to terminate the service\n' \
             + b'[<HELO>] to send a test hello string\n' \
             + b'Otherwise start typing and enjoy!' \
             + b'\n'
@@ -41,7 +42,7 @@ class Hall:
     def list_rooms(self, player):
         
         if len(self.rooms) == 0:
-            msg = 'Theyre are no rooms active at the moment. Create your own.\n' \
+            msg = 'We have no rooms occupied at the moment, please create your own\n' \
                 + 'Use [<join> room_name] to create a room.\n'
             player.socket.sendall(msg)
         else:
@@ -62,27 +63,31 @@ class Hall:
                 name = msg.split()[7]
                 player.name = name #updates in the player class
 		
-                print "New connection from:" + str(player.name) + '\n'
+                print "New connection from: " + str(player.name) + '\n'
 		
                 msg = ('JOINED_CHATROOM: '+ str(room_name) +'\n'+ 'SERVER_IP: ' + str(SERVER_IP) + '\n'
                    + 'PORT: ' + str(PORT) + '\n' + 'ROOM_REF: ' + str(ROOM_REF) +'\n' +'JOIN_ID: ' + str(JOIN_ID) + '\n')
                 player.socket.sendall(msg)
 		
 		
-                if player.name in self.room_player_map: # switching?
+                if player.name in self.room_player_map: # switching...........
                     if self.room_player_map[player.name] == room_name:
                         player.socket.sendall(b'You are already in room: ' + room_name)
                         same_room = True
-                    else: # switch
-                        old_room = self.room_player_map[player.name]
-                        self.rooms[old_room].remove_player(player)
+                    else: # assigns old_room and removes player from that room
+                        self.rooms[room_name].players.append(player) #add to list of sockets in Room
+                        self.rooms[room_name].welcome_new(player) 
+                        self.room_player_map[player.name] = room_name #assigns player.name to room_name
+                        #same_room = True
+                        #old_room = self.room_player_map[player.name]
+                        #self.rooms[old_room].remove_player(player)
                 if not same_room:
-                    if not room_name in self.rooms: # new room:
-                        new_room = Room(room_name)
-                        self.rooms[room_name] = new_room
-                    self.rooms[room_name].players.append(player)
-                    self.rooms[room_name].welcome_new(player)
-                    self.room_player_map[player.name] = room_name
+                    if not room_name in self.rooms: # not in rooms dictionary
+                        new_room = Room(room_name) #instance of room class called new_room
+                        self.rooms[room_name] = new_room #update in rooms {ROOM_1:room_name}, room_name inputted by suer 
+                    self.rooms[room_name].players.append(player) #add to list of sockets in Room
+                    self.rooms[room_name].welcome_new(player) 
+                    self.room_player_map[player.name] = room_name #assigns player.name to room_name
             else:
                 player.socket.sendall(instructions)
 
@@ -103,26 +108,35 @@ class Hall:
         
         elif "KILL_SERVICE" in msg:
             sys.exit(2)
+    
+        elif "<another>" in msg:
+            room_name = msg
+       
+            self.rooms[room_name].players.append(player) #add to list of sockets in Room
+            self.rooms[room_name].welcome_new(player) 
+            self.room_player_map[player.name] = room_name
+       
+        elif "print_map" in msg:
+            print self.room_player_map[1]
+        
 
         elif 'HELO text\n' in msg:
             data = 'HELO text\nIP:'+str(SERVER_IP)+'\n'+'Port:'+str(PORT)+'\n'+'StudentID: '+str(STUDENT_ID)+'\n'
             player.socket.sendall(data)
-
-            
-            
+              
         else:
-            # check if in a room or not first
+            # check if in a room (or not) first
             if player.name in self.room_player_map:
                 self.rooms[self.room_player_map[player.name]].broadcast(player, msg)
             else:
                 msg = 'You are currently not in any room. \n' \
-                    + 'Use [<list>] to see available rooms. \n' \
+                   + 'Use [<list>] to see available rooms. \n' \
                     + 'Use [<join> room_name] to join a room. \n'
                 player.socket.sendall(msg)
     
-    def remove_player(self, player):
+    def remove_player(self, player): #server side 
         if player.name in self.room_player_map:
-            self.rooms[self.room_player_map[player.name]].remove_player(player)
+            self.rooms[self.room_player_map[player.name]].remove_player(player) #calls remove_player in ROOM class
             del self.room_player_map[player.name]
         print "User: " + player.name + " has left\n"
 
@@ -138,14 +152,14 @@ class Room:
             player.socket.sendall(msg)
     
     def broadcast(self, from_player, msg): #BROADCASTS MESSSAGES 
-        #msg = from_player.name + b":" + msg
+       #msg = from_player.name + b":" + msg
         for player in self.players:
             player.socket.sendall(msg)
 
     def remove_player(self, player):
         self.players.remove(player)
         leave_msg = ('LEFT_CHATROOM: ' + str(ROOM_REF) + '\n' + 'JOIN_ID: ' + str(JOIN_ID) + '\n')
-        self.broadcast(player, leave_msg)
+        self.broadcast(player, leave_msg) #client side 
 
 class Player:
     def __init__(self, socket, name = "new"):
@@ -155,4 +169,4 @@ class Player:
 		
 
     def fileno(self):
-		return self.socket.fileno()
+	    return self.socket.fileno()

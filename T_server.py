@@ -16,7 +16,7 @@ while True:
 	# get the list sockets which are ready to be read through select
         # 4th arg, time_out  = 0 : poll and never block
 	#here we handle the new players/sockets, intially passed to the select function
-	
+	#player.fileno
 	read_players, write_players, error_sockets = select.select(connection_list, [], [])
     	for player in read_players:
        		if player is listen_sock: # compares returned readable sockets/players to the connection made to client(listen_sock)

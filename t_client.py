@@ -80,10 +80,17 @@ while True:
             elif '<list>' in msg:
                 msg = '<list>\n' 
                 server_connection.sendall(msg)
+            
+            elif '<another>' in msg:
+                msg = '<another>\n' 
+                server_connection.sendall(msg)
 
+            elif '<print_map>' in msg:
+                msg = '<print_map>\n' 
+                server_connection.sendall(msg)
 			
             else:
-                data = 'CHAT: ' + str(ROOM_REF) + '\n' + 'CLIENT_NAME: ' + str(CLIENT_NAME) + '\n' + 'MESSAGE: ' + str(msg) + '\n' 
+                data = 'CHAT: [room_ref]' + '\n' + 'CLIENT_NAME: ' + str(CLIENT_NAME) + '\n' + 'MESSAGE: ' + str(msg) + '\n' 
                 server_connection.sendall(data)
 
 		    
