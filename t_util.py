@@ -83,17 +83,11 @@ class Hall:
                  + 'PORT: ' + str(PORT) + '\nROOM_REF: ' + str(self.room_refs.index(room_name)) +'\nJOIN_ID: ' + str(player.ID) + '\n')
                 player.socket.sendall(msg)
                 
-                
                     
                 data = (str(player.name) + ' has joined this chatroom')
                 msg3 = ('CHAT: ' + str(self.room_refs.index(room_name)) + '\nCLIENT_NAME: ' + str(player.name) +'\nMESSAGE: ' + data + '\n\n')          
-                #print self.rooms
                 
-                #for room in self.rooms:
-                    #print self.rooms[room].name
-                #print '\n'  
-                #print 'room_name = ' + room_name
-                #print 'self.rooms[room_name].name = ' + self.rooms[room_name].name + '\n\n'
+
                 self.rooms[room_name].broadcast(player, msg3)  
            
                 
@@ -120,9 +114,9 @@ class Hall:
         
         elif "DISCONNECT" in msg:            
             player.socket.shutdown(1)
-            self.remove_player(player)
+            #self.remove_player(player)
             
-        elif "LEAVE_CHATROOM" in msg: #receives from server sends to remove function
+        elif msg2[0] == 'LEAVE_CHATROOM:': #receives from server sends to remove function
             
             ROOM_REF = msg2[1]
             JOIN_ID = msg2[3]
@@ -134,10 +128,12 @@ class Hall:
             msg3 = ('LEFT_CHATROOM: ' + str(ROOM_REF) + '\nJOIN_ID: ' + str(JOIN_ID) + '\n') 
             player.socket.sendall(msg3) 
             
-            if player.name in self.room_player_map:
-                self.rooms[self.room_player_map[player.name]].remove_player(player, ROOM_REF) 
-               
-          
+            leave_msg = ('CHAT: ' + str(ROOM_REF) + '\nCLIENT_NAME: ' + str(player.name) + '\nMESSAGE: ' + str(player.name) + ' has left this chatroom\n\n')
+            player.socket.sendall(leave_msg)
+            print self.room_player_map
+            self.rooms[self.room_player_map[player.name]].remove_player(player, ROOM_REF)
+                #del self.room_player_map[player.name]
+  
 
         elif "KILL_SERVICE\n" in msg:
             sys.exit(2)
@@ -149,11 +145,9 @@ class Hall:
         elif 'HELO BASE_TEST\n' in msg:
             data = 'HELO text\nIP:'+ '134.226.44.155' +'\nPort:'+'22222'+'\nStudentID: '+str(STUDENT_ID)+'\n'
             player.socket.sendall(data)
-              
-        
-            
-    
+                 
     def remove_player(self, player, ROOM_REF): #server side 
+        #print 'hello'
         if player.name in self.room_player_map:
             self.rooms[self.room_player_map[player.name]].remove_player(player, ROOM_REF) #calls remove_player in ROOM class
             del self.room_player_map[player.name]
@@ -163,14 +157,7 @@ class Room:
     def __init__(self, name):
         self.players = [] # a list of sockets
         self.name = name
-       # self.room_ref = room_ref
-   
-
-    #def welcome_new(self, from_player):
-        #data = (str(player.name) + ' has joined this chatroom')
-        #msg2 = ('CHAT: ' + str(self.room_refs.index(room_name)) + '\nCLIENT_NAME: ' + str(player.name) +'\nMESSAGE: ' + data +
-        #for player in self.players:
-            #player.socket.sendall(msg2)
+       
     
     def broadcast(self, from_player, msg): #BROADCASTS MESSSAGES 
         for player in self.players:
@@ -178,12 +165,11 @@ class Room:
             
 
     def remove_player(self, player, ROOM_REF): #sends to all clients in chatroom
-        #print('leave2')
-       
-        left = (str(player.name) + ' has left this chatroom')
-        leave_msg = ('CHAT: ' + str(ROOM_REF) + '\nCLIENT_NAME: ' + str(player.name) + '\nMESSAGE: ' + str(player.name) + ' has left this chatroom\n\n')
-        self.broadcast(player, leave_msg) #client side 
-        self.players.remove(player)
+        
+        #self.broadcast(player, leave_msg) #client side 
+        print self.players
+        for player in self.players:
+            self.players.remove(player)
 
 class Player:
     def __init__(self, socket, ID = '0', name = "new"):
