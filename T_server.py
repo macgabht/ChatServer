@@ -7,6 +7,7 @@ RECV_BUFFER = 4096
 host = sys.argv[1] if len (sys.argv) >=2 else ''
 listen_sock = t_util.create_socket((host, t_util.PORT))
 
+
 hall = Hall() #essentially a constructor for class "Block"
 connection_list = [] #starts out empty connection list
 connection_list.append(listen_sock) #updates connection list with with listen socket
@@ -23,7 +24,7 @@ while True:
 		     new_socket, add = player.accept()
 		     new_player = Player(new_socket) #this passes this new socket to the player class and updates
              	     connection_list.append(new_player) #update our connection list with each new player
-                     hall.welcome_new(new_player) #calls welcome function in Hall
+                    # hall.welcome_new(new_player) #calls welcome function in room
 
 		else: #new message incoming
 		     msg = player.socket.recv(RECV_BUFFER)
