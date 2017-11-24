@@ -22,7 +22,8 @@ while True:
     	for player in read_players:
        		if player is listen_sock: # compares returned readable sockets/players to the connection made to client(listen_sock)
 		     new_socket, add = player.accept()
-		     new_player = Player(new_socket) #this passes this new socket to the player class and updates
+
+		     new_player = Player(new_socket) #this passes this new socket to the player class and upd
              	     connection_list.append(new_player) #update our connection list with each new player
                     # hall.welcome_new(new_player) #calls welcome function in room
 
