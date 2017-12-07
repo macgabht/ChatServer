@@ -5,11 +5,11 @@ Tiarnan MacGabhann
 
 Utilities code is made up of Hall, Room and Player classes. 
 Hall stores a number of lists and dictionaries. 
-- 'rooms' is a dictionary that stores room_names as keys, that act as objects to the Room class
-- 'key_room' map is a dictionary that stores a key unique to each room_name - player combination, and returns the corresponding room name
-- 'room_refs' is just a list of room names. The ROOM_REF variable is assigned the value of the index of the room name it corresponds to in this list 
-- join_ids is a dictionary with the JOIN_ID as the key that returns the corresponding player name
-- clients is a list containing the player names as the join (the indices of the list are used to assign the JOIN_ID variables)
+'rooms' is a dictionary that stores room_names as keys, that act as objects to the Room class
+'key_room' map is a dictionary that stores a key unique to each room_name - player combination, and returns the corresponding room name
+'room_refs' is just a list of room names. The ROOM_REF variable is assigned the value of the index of the room name it corresponds to in this list 
+join_ids is a dictionary with the JOIN_ID as the key that returns the corresponding player name
+clients is a list containing the player names as the join (the indices of the list are used to assign the JOIN_ID variables)
 
 In the Hall class, the process_msg function is called when the server receives a message, taking the player instance and the msg as its parameters. It handles any possible strings that the client may send.
 The first if statement handles the "JOIN_CHATROOM" message. Within this there are four permutations dealt with:
@@ -17,8 +17,7 @@ The first if statement handles the "JOIN_CHATROOM" message. Within this there ar
       a new_room instance of the Room class is created taking the room_name as its parameter
       The player socket passed in from the server is added to the players[] list in that room instance
       The various other lists are appended and the ROOM_REF and JOIN_ID are assigned
-      The key assigned to each player/room combo in the dictionary is created by adding the players JOIN_ID with the ROOM_REF which should 
-      give us a unique integer used later on. This key will be created every time a player joins another room
+      The key assigned to each player/room combo in the dictionary is created by adding the players JOIN_ID with the ROOM_REF which           should give us a unique integer used later on. This key will be created every time a player joins another room
     b)A new player joins an existing room:  
     c)An existing player creates a new room:
     d) An existing player player joins an existing room.
