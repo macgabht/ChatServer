@@ -26,23 +26,21 @@ The first if statement handles the "JOIN_CHATROOM" message. Within this there ar
    
 
 Room class:
-
-    takes single parameter name from server
-    contains a list of sockets called player 
-    contains broadcase and remove functions
+takes single parameter name from server
+contains a list of sockets called player 
+contains broadcase and remove functions
 
 Player class:
-
-    takes socket, key and name as parameters
-    
-    
+takes socket, key and name as parameters
+  
 *******PROBLEMS ON TEST SERVER******
    -currently on 53% 
    -getting stuck on receiving messages from second client, somewhere in the parsing of the messages
    -Receiving and acknowledging the first client fine but second one getting ERROR: First string not of form 'CHAT::XXXXX'
    -feel like its a small thing but can't put my finger on it
-   
-   -
+  
+********
+The files 'T_server.py' and 't_util.py' are the relevant files to be compiled
     
     
    
